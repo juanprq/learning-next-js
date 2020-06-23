@@ -3,8 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import Head from 'next/head';
+import marked from 'marked';
 
-const Post = ({ slug, content, data }) => {
+const Post = ({ slug, htmlString, data }) => {
   return (
     <>
       <Head>
@@ -13,9 +14,7 @@ const Post = ({ slug, content, data }) => {
       <div>
         Hello, the slug for this is: {slug}
       </div>
-      <pre>
-       {content}
-      </pre>
+      <div dangerouslySetInnerHTML={{ __html: htmlString }} />
     </>
   );
 };
@@ -38,11 +37,12 @@ export const getStaticProps = ({ params: { slug } }) => {
   const rawMarkdown = fs.readFileSync(path.join('posts', `${slug}.md`)).toString();
   const parsedMarkdown = matter(rawMarkdown);
   const { content, data } = parsedMarkdown;
+  const htmlString = marked(content);
 
   return {
     props: {
       slug,
-      content,
+      htmlString,
       data,
     },
   };
